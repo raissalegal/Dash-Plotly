@@ -1,0 +1,1 @@
+I am learning how to build dashboards using the Dash library in Python, and this repo is where I store the code for the suggested tasks from [Plotly Dash Course videos](https://youtube.com/playlist?list=PLYD54mj9I2JevdabetHsJ3RLCeMyBNKYV&si=7n3WVwcv7Ccx-iCG).
