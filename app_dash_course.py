@@ -1,18 +1,37 @@
 from dash import Dash, html, dash_table, dcc, callback, Output, Input
+import dash_ag_grid as dag
 import pandas as pd
 import numpy as np
 import plotly.express as px
-#import dash_ag_grid as dag
 
-# Incorporate data
 df = pd.read_csv('https://raw.githubusercontent.com/plotly/datasets/master/Dash-Course/makeup-shades/shades.csv')
 
+fig = px.scatter(
+    df, x="V", y="S",
+    hover_data=['H',"S","V","L","hex"]
+    )
 
+columnDefs = [
+    { 'field': 'brand'},
+    { 'field': 'brand_short'},
+    { 'field': 'product'},
+    { 'field': 'product_short'},
+    { 'field': 'hex'},
+    { 'field': 'H'},
+    { 'field': 'S'},
+    { 'field': 'V'},
+    { 'field': 'L'},
+    { 'field': 'group'},
+]
 
-'''
-# Plotly graphs
-fig = px.histogram(df, x='continent', y='pop', histfunc='avg')
-'''
+grid = dag.AgGrid(
+    id="df_aggrid",
+    rowData=df.to_dict("records"),
+    columnDefs=columnDefs,
+    dashGridOptions={'pagination':True},
+    className="ag-theme-alpine-dark",
+    columnSize="sizeToFit",
+)
 
 # Initialize the app
 app = Dash(__name__)
@@ -39,26 +58,30 @@ app.layout = html.Div([
         6: "Japanese Best Sellers",
         7: "Indian Best Sellers"
         }
-    )
+    ),
+    html.Hr(),
+    
+    dcc.RangeSlider(
+        df['S'].min(),
+        df['S'].max(),
+        step=0.05,
+    ),
+    html.Hr(),
+    
+    dcc.Input(
+        placeholder='Enter a value...',
+        type='number',
+        value='',
+    ),
+    html.Hr(),
 
-    #dcc.RadioItems(options=['pop', 'lifeExp', 'gdpPercap'], value='lifeExp', id='column-options'),
-    #dag.AgGrid(
-    #   id="grid",
-    #   rowData=df.to_dict("records"),
-    #   columnDefs=[{"field": i} for i in df.columns],
-    #),
-    #dcc.Graph(figure=fig, id='graph1')
+    dcc.Graph(figure=fig, id='scatter_plot'),
+    html.Hr(),
+    
+    
+    grid
+
 ])
-'''
-# Add controls to build the interaction
-@callback(
-    Output(component_id='graph1', component_property='figure'),
-    Input(component_id='column-options', component_property='value')
-)
-def update_graph(col_chosen):
-    fig = px.histogram(df, x='continent', y=col_chosen, histfunc='avg')
-    return fig
-'''
 
 # Run the app
 if __name__ == '__main__':
